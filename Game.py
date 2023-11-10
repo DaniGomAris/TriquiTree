@@ -58,34 +58,6 @@ class TicTacToeGame:
 
         return score
 
-    def best_move(self):
-        """
-        Encuentra la mejor jugada posible para la maquina utilizando el metodo minimax
-        """
-        max_eval = -self.INF
-        alpha = -self.INF
-        beta = self.INF
-
-        empty_cells = self.find_empty_cells()
-
-        best_play = None
-
-        # Recorre las celdas vacias para evaluar las posibles jugadas
-        for cell in empty_cells:
-            
-            self.board[cell[0]][cell[1]] = self.MACHINE
-
-            # Llama a  minimax para evaluar la mejor posible jugada
-            evaluation = self.minimax(self.HUMAN, alpha, beta, 5) 
-
-            self.board[cell[0]][cell[1]] = self.EMPTY_CELL
-
-            if evaluation > max_eval:
-                max_eval = evaluation
-                best_play = cell
-
-        # Retorna la mejor jugada encontrada
-        return best_play
 
     def minimax(self, player, alpha, beta, depth) -> float:
         """
@@ -133,6 +105,34 @@ class TicTacToeGame:
 
             return min_eval
 
+    def best_move(self):
+        """
+        Encuentra la mejor jugada posible para la maquina utilizando el metodo minimax
+        """
+        max_eval = -self.INF
+        alpha = -self.INF
+        beta = self.INF
+
+        empty_cells = self.find_empty_cells()
+
+        best_play = None
+
+        # Recorre las celdas vacias para evaluar las posibles jugadas
+        for cell in empty_cells:
+            
+            self.board[cell[0]][cell[1]] = self.MACHINE
+
+            # Llama a  minimax para evaluar la mejor posible jugada
+            evaluation = self.minimax(self.HUMAN, alpha, beta, 5) 
+
+            self.board[cell[0]][cell[1]] = self.EMPTY_CELL
+
+            if evaluation > max_eval:
+                max_eval = evaluation
+                best_play = cell
+
+        # Retorna la mejor jugada encontrada
+        return best_play
 
     def play_machine(self):
         """

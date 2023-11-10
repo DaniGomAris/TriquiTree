@@ -29,8 +29,8 @@ class TicTacToeMenu:
         """
         while True:
             try:
-                row = int(input("Ingresa la fila (0-3): "))
-                col = int(input("Ingresa la columna (0-3): "))
+                row = int(input("Enter row (0-3): "))
+                col = int(input("Enter col (0-3): "))
                 print()
 
                 # Verifica si lo que puso el jugador humano, es valido
@@ -71,7 +71,9 @@ class TicTacToeMenu:
             # Imprime el tablero y el estado actual
             self.print_board_and_status()
 
-            print(f"\n--- Turno de {current_player} ---")
+            print()
+            print(f"--- {current_player} Turn---")
+            print()
             
             # Realiza el turno del jugador humano o de la maquina
             if current_player == self.game.HUMAN:

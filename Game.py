@@ -6,10 +6,9 @@ class TicTacToeGame:
         self.MACHINE = "❌"
         self.HUMAN = "⭕"
         self.EMPTY_CELL = "⬜"
-        self.INF = float('inf')
+        self.INF = float('inf') #(-∞) o (+∞)
         self.BOARD_SIZE = 4
-        # Crear un tablero vacio
-        self.board = np.full((self.BOARD_SIZE, self.BOARD_SIZE), self.EMPTY_CELL)
+        self.board = [[self.EMPTY_CELL] * self.BOARD_SIZE for _ in range(self.BOARD_SIZE)]
 
     def find_empty_cells(self) -> list:
         """
@@ -17,23 +16,28 @@ class TicTacToeGame:
         """
         empty_cells = []
 
-        for row_index, row in enumerate(self.board):
-            for col_index, cell in enumerate(row):
-                if cell != self.MACHINE and cell != self.HUMAN:
-                    empty_cells.append((row_index, col_index))
+        # Se va moviendo entre las filas del tablero
+        for current_row, row in enumerate(self.board):
+            # Se va moviendo entre las columnas de ;as filas
+            for current_col, col in enumerate(row):
+                if col != self.MACHINE and col != self.HUMAN:
+                    empty_cells.append((current_row, current_col))
         return empty_cells
 
     def is_winner(self, player) -> bool:
         """
         Verifica si el jugador actual es el ganador siguiendo el patron en forma de "L"
         """
-        for row_index, row in enumerate(self.board):
-            if row_index != self.BOARD_SIZE - 1:
-                for col_index, cell in enumerate(row):
-                    if col_index != self.BOARD_SIZE - 1 and cell == player:
+        # Se va moviendo entre las filas del tablero
+        for current_row, row in enumerate(self.board):
+            if current_row != self.BOARD_SIZE - 1:
+                # Se va moviendo entre las columnas de ;as filas
+                for current_col, col in enumerate(row):
+                    if current_col != self.BOARD_SIZE - 1 and col == player:
+                        # Analiza primero la posicion actual (1,1) luego analiza (1,1)(2,1) y luego (1,1)(2,1)(2,2), que pertenezcan al mismo jugador
                         if (
-                            self.board[row_index + 1][col_index] == player
-                            and self.board[row_index + 1][col_index + 1] == player
+                            self.board[current_row + 1][current_col] == player
+                            and self.board[current_row + 1][current_col + 1] == player
                         ):
                             return True
         return False
@@ -43,16 +47,20 @@ class TicTacToeGame:
         Evalua el estado actual del tablero y devuelve un puntaje
         """
         score = 0
+
+        # Si la maquina gano y el jugador perdio
         if self.is_winner(self.MACHINE) and not self.is_winner(self.HUMAN):
-            score += self.INF
-        elif not self.is_winner(self.MACHINE) and self.is_winner(self.HUMAN):
-            score -= self.INF
+            score += self.INF # +∞
+
+        # Si el jugador gano y la maquina perdio
+        if self.is_winner(self.HUMAN) and not self.is_winner(self.MACHINE):
+            score -= self.INF # -∞
 
         return score
 
     def best_move(self):
         """
-        Encuentra la mejor jugada posible para la maquina utilizando el algoritmo minimax con "pruning alpha-beta"
+        Encuentra la mejor jugada posible para la maquina utilizando el metodo minimax
         """
         max_eval = -self.INF
         alpha = -self.INF
@@ -60,58 +68,71 @@ class TicTacToeGame:
 
         empty_cells = self.find_empty_cells()
 
-        best_move = None
+        best_play = None
 
+        # Recorre las celdas vacias para evaluar las posibles jugadas
         for cell in empty_cells:
+            
             self.board[cell[0]][cell[1]] = self.MACHINE
-            # Llama al algoritmo minimax para evaluar la jugada
-            evaluation = self.minimax(self.HUMAN, alpha, beta, 5)
+
+            # Llama a  minimax para evaluar la mejor posible jugada
+            evaluation = self.minimax(self.HUMAN, alpha, beta, 5) 
+
             self.board[cell[0]][cell[1]] = self.EMPTY_CELL
-            # Actualiza la mejor jugada si la evaluacion es mayor
+
             if evaluation > max_eval:
                 max_eval = evaluation
-                best_move = cell
+                best_play = cell
 
-        return best_move
+        # Retorna la mejor jugada encontrada
+        return best_play
 
     def minimax(self, player, alpha, beta, depth) -> float:
         """
-        Algoritmo minimax con "alpha-beta pruning" para saber cuale s la mejor jugada
+        Algoritmo minimax con "alpha-beta pruning" para saber cual es la mejor jugada
         """
+        # Nodos hoja del árbol
         if depth == 0 or self.is_winner(self.HUMAN) or self.is_winner(self.MACHINE):
             return self.evaluate()
 
         empty_cells = self.find_empty_cells()
 
-        if player == self.MACHINE:
+        # Jugador MAX (máquina)
+        if player == self.MACHINE:  
             max_eval = -self.INF
+
             for cell in empty_cells:
                 self.board[cell[0]][cell[1]] = self.MACHINE
-                # Llama recursivamente al algoritmo minimax con el siguiente jugador
+
                 evaluation = self.minimax(self.HUMAN, alpha, beta, depth - 1)
+                
                 self.board[cell[0]][cell[1]] = self.EMPTY_CELL
-                # Actualiza el puntaje máximo y los valores de alpha
+
                 max_eval = max(max_eval, evaluation)
                 alpha = max(alpha, evaluation)
+
                 if alpha >= beta:
                     break
 
             return max_eval
-
-        else:
+        
+        # Jugador MIN (humano)
+        else:  
             min_eval = self.INF
+
             for cell in empty_cells:
                 self.board[cell[0]][cell[1]] = self.HUMAN
-                # Llama recursivamente al algoritmo minimax con el siguiente jugador
                 evaluation = self.minimax(self.MACHINE, alpha, beta, depth - 1)
                 self.board[cell[0]][cell[1]] = self.EMPTY_CELL
-                # Actualiza el puntaje mínimo y los valores de beta
+
                 min_eval = min(min_eval, evaluation)
                 beta = min(beta, evaluation)
-                if beta <= alpha:
+
+                if alpha >= beta:
                     break
 
             return min_eval
+
 
     def play_machine(self):
         """

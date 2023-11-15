@@ -18,7 +18,7 @@ class TicTacToeGame:
 
         # Se va moviendo entre las filas del tablero
         for current_row, row in enumerate(self.board):
-            # Se va moviendo entre las columnas de ;as filas
+            # Se va moviendo entre las columnas de las filas
             for current_col, col in enumerate(row):
                 if col != self.MACHINE and col != self.HUMAN:
                     empty_cells.append((current_row, current_col))
@@ -75,9 +75,7 @@ class TicTacToeGame:
 
             for cell in empty_cells:
                 self.board[cell[0]][cell[1]] = self.MACHINE
-
                 evaluation = self.minimax(self.HUMAN, alpha, beta, depth - 1)
-                
                 self.board[cell[0]][cell[1]] = self.EMPTY_CELL
 
                 max_eval = max(max_eval, evaluation)
@@ -124,7 +122,7 @@ class TicTacToeGame:
 
             # Llama a  minimax para evaluar la mejor posible jugada
             evaluation = self.minimax(self.HUMAN, alpha, beta, 5) 
-
+            
             self.board[cell[0]][cell[1]] = self.EMPTY_CELL
 
             if evaluation > max_eval:
